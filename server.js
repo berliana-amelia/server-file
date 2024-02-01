@@ -9,7 +9,7 @@ const errorMiddleware = require("./middleware/errorMiddleware");
 const cors = require("cors");
 
 const MONGO_URL = process.env.MONGO_URL;
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT;
 const FRONTEND = process.env.FRONTEND;
 
 var corsOptions = {
