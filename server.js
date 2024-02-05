@@ -27,7 +27,7 @@ app.use("/data", dataRoute);
 app.use("/sensor", sensorRoute);
 
 app.get("/", (req, res) => {
-  res.send("Hello NODE API");
+  res.send("Hello Guys !!");
 });
 
 // Middleware
