@@ -1,6 +1,4 @@
 const express = require("express");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 const router = express.Router();
 const Inorwat = require("../models/sensorModel");
 const authenticateToken = require("../middleware/authMiddleware");
@@ -23,13 +21,13 @@ const updateMotorAndSprayerStatus = async (inorwat) => {
 
       // Check if the current time is within a 5-minute range of the scheduled time
       const timeDifference = Math.abs(now.getTime() - scheduledTime.getTime());
-      const withinRange = timeDifference <= 5 * 60 * 1000; // 5 minutes in milliseconds
+      const withinRange = timeDifference <= 2 * 60 * 1000; // 5 minutes in milliseconds
 
       if (withinRange) {
         // Set motor and sprayer to 1
         inorwat.motor = 1;
         inorwat.sprayer = 1;
-
+        console.log("change to 1");
         // Save the changes to the document
         await inorwat.save();
 
@@ -40,7 +38,7 @@ const updateMotorAndSprayerStatus = async (inorwat) => {
             // Reset motor and sprayer to 0
             inorwat.motor = 0;
             inorwat.sprayer = 0;
-
+            console.log("change to 0");
             // Save the changes to the document after 15 minutes
             await inorwat.save();
           }
