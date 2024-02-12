@@ -6,6 +6,52 @@ const moment = require("moment-timezone");
 const schedule = require("node-schedule");
 
 // Function to update motor and sprayer status
+// const updateMotorAndSprayerStatus = async (inorwat) => {
+//   try {
+//     // Check if startStatus is 1
+//     if (inorwat.startStatus === 1) {
+//       const now = new Date();
+
+//       // Extract hours and minutes from the start time
+//       const [startHour, startMinute] = inorwat.startTime.split(":");
+
+//       // Set the scheduled time based on the start time
+//       const scheduledTime = new Date(now);
+//       scheduledTime.setHours(Number(startHour), Number(startMinute), 0, 0); // Set hours, minutes, seconds, and milliseconds
+//       console.log("schedule Time", scheduledTime.getTime());
+//       // Check if the current time is within a 5-minute range of the scheduled time
+//       const timeDifference = Math.abs(now.getTime() - scheduledTime.getTime());
+//       const withinRange = timeDifference <= 1 * 60 * 1000; // 5 minutes in milliseconds
+
+//       if (withinRange) {
+//         // Set motor and sprayer to 1
+//         inorwat.motor = 1;
+//         inorwat.sprayer = 1;
+//         console.log("change to 1");
+//         // console.log("current Time", now.getTime());
+//         // Save the changes to the document
+//         await inorwat.save();
+
+//         // Schedule a job to reset motor and sprayer after 15 minutes
+//         schedule.scheduleJob(
+//           new Date(now.getTime() + 15 * 60 * 1000),
+//           async () => {
+//             // Reset motor and sprayer to 0
+//             inorwat.motor = 0;
+//             inorwat.sprayer = 0;
+//             console.log("change to 0");
+//             // console.log(now.getTime());
+//             // Save the changes to the document after 15 minutes
+//             await inorwat.save();
+//           }
+//         );
+//       }
+//     }
+//   } catch (error) {
+//     console.error("Error updating motor and sprayer status:", error.message);
+//   }
+// };
+
 const updateMotorAndSprayerStatus = async (inorwat) => {
   try {
     // Check if startStatus is 1
@@ -21,7 +67,7 @@ const updateMotorAndSprayerStatus = async (inorwat) => {
       console.log("schedule Time", scheduledTime.getTime());
       // Check if the current time is within a 5-minute range of the scheduled time
       const timeDifference = Math.abs(now.getTime() - scheduledTime.getTime());
-      const withinRange = timeDifference <= 1 * 60 * 1000; // 5 minutes in milliseconds
+      const withinRange = timeDifference <= 1 * 30 * 1000; // 5 minutes in milliseconds
 
       if (withinRange) {
         // Set motor and sprayer to 1
@@ -34,11 +80,19 @@ const updateMotorAndSprayerStatus = async (inorwat) => {
 
         // Schedule a job to reset motor and sprayer after 15 minutes
         schedule.scheduleJob(
-          new Date(now.getTime() + 1 * 90 * 1000),
+          new Date(now.getTime() + 1 * 60 * 1000),
           async () => {
+            const currentTime = moment().tz("Asia/Jakarta");
+
+            // Add 4 minutes to the current time
+            const newTime = currentTime.add(4, "minutes");
+
+            // Format the new time as HH:mm
+            const newFormattedTime = newTime.format("HH:mm");
             // Reset motor and sprayer to 0
             inorwat.motor = 0;
             inorwat.sprayer = 0;
+            inorwat.startTime = newFormattedTime;
             console.log("change to 0");
             // console.log(now.getTime());
             // Save the changes to the document after 15 minutes
@@ -51,7 +105,6 @@ const updateMotorAndSprayerStatus = async (inorwat) => {
     console.error("Error updating motor and sprayer status:", error.message);
   }
 };
-
 // Schedule the job every hour
 const scheduleJob = schedule.scheduleJob("0 * * * *", async () => {
   try {
@@ -156,6 +209,7 @@ router.put("/", authenticateToken, async (req, res) => {
     res.status(500).send(error.message);
   }
 });
+
 router.post("/", authenticateToken, async (req, res) => {
   try {
     const newInorwat = await Inorwat.create(req.body);
