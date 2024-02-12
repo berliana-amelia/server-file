@@ -18,27 +18,29 @@ const updateMotorAndSprayerStatus = async (inorwat) => {
       // Set the scheduled time based on the start time
       const scheduledTime = new Date(now);
       scheduledTime.setHours(Number(startHour), Number(startMinute), 0, 0); // Set hours, minutes, seconds, and milliseconds
-
+      console.log("schedule Time", scheduledTime.getTime());
       // Check if the current time is within a 5-minute range of the scheduled time
       const timeDifference = Math.abs(now.getTime() - scheduledTime.getTime());
-      const withinRange = timeDifference <= 2 * 60 * 1000; // 5 minutes in milliseconds
+      const withinRange = timeDifference <= 1 * 60 * 1000; // 5 minutes in milliseconds
 
       if (withinRange) {
         // Set motor and sprayer to 1
         inorwat.motor = 1;
         inorwat.sprayer = 1;
         console.log("change to 1");
+        // console.log("current Time", now.getTime());
         // Save the changes to the document
         await inorwat.save();
 
         // Schedule a job to reset motor and sprayer after 15 minutes
         schedule.scheduleJob(
-          new Date(now.getTime() + 15 * 60 * 1000),
+          new Date(now.getTime() + 1 * 90 * 1000),
           async () => {
             // Reset motor and sprayer to 0
             inorwat.motor = 0;
             inorwat.sprayer = 0;
             console.log("change to 0");
+            // console.log(now.getTime());
             // Save the changes to the document after 15 minutes
             await inorwat.save();
           }
@@ -76,11 +78,9 @@ router.put("/", authenticateToken, async (req, res) => {
       return res.status(404).send("Inorwat not found");
     }
 
-    // Update the endDate based on the new startDate + 5 days
-    if (updatedData.startDate) {
-      const newEndDate = new Date(updatedData.startDate);
-      newEndDate.setDate(newEndDate.getDate() + 5);
-      updatedData.endDate = newEndDate;
+    if (updatedData.startStatus === 0) {
+      updatedData.motor = 0;
+      updatedData.sprayer = 0;
     }
 
     // Check if startStatus is changed to 1
@@ -88,6 +88,49 @@ router.put("/", authenticateToken, async (req, res) => {
       // Update startTime to the current time in the format "15:59"
       const currentTime = moment().tz("Asia/Jakarta").format("HH:mm");
       updatedData.startTime = currentTime;
+
+      // Validate startDate before creating a new Date object
+      const isValidStartDate = moment(
+        updatedData.startDate,
+        "YYYY-MM-DD",
+        true
+      ).isValid();
+
+      if (isValidStartDate) {
+        const newEndDate = moment(updatedData.startDate)
+          .add(5, "days")
+          .toDate();
+        updatedData.endDate = newEndDate;
+      } else {
+        console.error("Invalid startDate format");
+        // Handle the error or return from the function as needed
+      }
+    }
+
+    if (updatedData.motor === 1) {
+      schedule.scheduleJob(
+        new Date(now.getTime() + 1 * 90 * 1000),
+        async () => {
+          // Reset motor and sprayer to 0
+          currentInorwat.motor = 0;
+          console.log("change to 0");
+          // Save the changes to the document after 15 minutes
+          await currentInorwat.save();
+        }
+      );
+    }
+
+    if (updatedData.sprayer === 1) {
+      schedule.scheduleJob(
+        new Date(now.getTime() + 1 * 90 * 1000),
+        async () => {
+          // Reset motor and sprayer to 0
+          currentInorwat.sprayer = 0;
+          console.log("change to 0");
+          // Save the changes to the document after 15 minutes
+          await currentInorwat.save();
+        }
+      );
     }
 
     // Perform the update
