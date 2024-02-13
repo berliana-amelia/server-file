@@ -127,6 +127,8 @@ const scheduleJob = schedule.scheduleJob("0 * * * *", async () => {
 router.put("/", authenticateToken, async (req, res) => {
   try {
     const updatedData = req.body;
+    const now = moment.tz("Asia/Jakarta");
+    const newTime = now.clone().add(1, "minutes");
 
     // Find the current document
     const currentInorwat = await Inorwat.findOne({ nama: "example" });
@@ -153,29 +155,23 @@ router.put("/", authenticateToken, async (req, res) => {
     }
 
     if (updatedData.motor === 1) {
-      schedule.scheduleJob(
-        new Date(now.valueOf() + 1 * 90 * 1000),
-        async () => {
-          // Reset motor and sprayer to 0
-          currentInorwat.motor = 0;
-          console.log("change to 0");
-          // Save the changes to the document after 15 minutes
-          await currentInorwat.save();
-        }
-      );
+      schedule.scheduleJob(newTime.valueOf(), async () => {
+        // Reset motor and sprayer to 0
+        currentInorwat.motor = 0;
+        console.log("change to 0");
+        // Save the changes to the document after 15 minutes
+        await currentInorwat.save();
+      });
     }
 
     if (updatedData.sprayer === 1) {
-      schedule.scheduleJob(
-        new Date(now.valueOf() + 1 * 90 * 1000),
-        async () => {
-          // Reset motor and sprayer to 0
-          currentInorwat.sprayer = 0;
-          console.log("change to 0");
-          // Save the changes to the document after 15 minutes
-          await currentInorwat.save();
-        }
-      );
+      schedule.scheduleJob(newTime.valueOf(), async () => {
+        // Reset motor and sprayer to 0
+        currentInorwat.sprayer = 0;
+        console.log("change to 0");
+        // Save the changes to the document after 15 minutes
+        await currentInorwat.save();
+      });
     }
 
     // Perform the update
@@ -216,7 +212,6 @@ router.get("/", authenticateToken, async (req, res) => {
   try {
     const inorwat = await Inorwat.findOneAndUpdate(
       { nama: "example" },
-      { $set: { timestamp: new Date() } },
       { new: true }
     );
 
