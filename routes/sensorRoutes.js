@@ -20,7 +20,7 @@ const schedule = require("node-schedule");
 //       scheduledTime.setHours(Number(startHour), Number(startMinute), 0, 0); // Set hours, minutes, seconds, and milliseconds
 //       console.log("schedule Time", scheduledTime.getTime());
 //       // Check if the current time is within a 5-minute range of the scheduled time
-//       const timeDifference = Math.abs(now.getTime() - scheduledTime.getTime());
+//       const timeDifference = Math.abs(now.valueOf() - scheduledTime.getTime());
 //       const withinRange = timeDifference <= 1 * 60 * 1000; // 5 minutes in milliseconds
 
 //       if (withinRange) {
@@ -28,19 +28,19 @@ const schedule = require("node-schedule");
 //         inorwat.motor = 1;
 //         inorwat.sprayer = 1;
 //         console.log("change to 1");
-//         // console.log("current Time", now.getTime());
+//         // console.log("current Time", now.valueOf());
 //         // Save the changes to the document
 //         await inorwat.save();
 
 //         // Schedule a job to reset motor and sprayer after 15 minutes
 //         schedule.scheduleJob(
-//           new Date(now.getTime() + 15 * 60 * 1000),
+//           new Date(now.valueOf() + 15 * 60 * 1000),
 //           async () => {
 //             // Reset motor and sprayer to 0
 //             inorwat.motor = 0;
 //             inorwat.sprayer = 0;
 //             console.log("change to 0");
-//             // console.log(now.getTime());
+//             // console.log(now.valueOf());
 //             // Save the changes to the document after 15 minutes
 //             await inorwat.save();
 //           }
@@ -65,9 +65,9 @@ const updateMotorAndSprayerStatus = async (inorwat) => {
       const scheduledTime = new Date(now);
       scheduledTime.setHours(Number(startHour), Number(startMinute), 0, 0); // Set hours, minutes, seconds, and milliseconds
       console.log("schedule Time", scheduledTime.getTime());
-      console.log("current Time", now.getTime());
+      console.log("current Time", now.valueOf());
       // Check if the current time is within a 5-minute range of the scheduled time
-      const timeDifference = Math.abs(now.getTime() - scheduledTime.getTime());
+      const timeDifference = Math.abs(now.valueOf() - scheduledTime.getTime());
       const withinRange = timeDifference <= 1 * 60 * 1000; // 5 minutes in milliseconds
 
       if (withinRange) {
@@ -75,13 +75,13 @@ const updateMotorAndSprayerStatus = async (inorwat) => {
         inorwat.motor = 1;
         inorwat.sprayer = 1;
         console.log("change to 1");
-        console.log("current Time", now.getTime());
+        console.log("current Time", now.valueOf());
         // Save the changes to the document
         await inorwat.save();
 
         // Schedule a job to reset motor and sprayer after 15 minutes
         schedule.scheduleJob(
-          new Date(now.getTime() + 1 * 30 * 1000),
+          new Date(now.valueOf() + 1 * 30 * 1000),
           async () => {
             const currentTime = moment().tz("Asia/Jakarta");
 
@@ -95,7 +95,7 @@ const updateMotorAndSprayerStatus = async (inorwat) => {
             inorwat.sprayer = 0;
             inorwat.startTime = newFormattedTime;
             console.log("change to 0");
-            // console.log(now.getTime());
+            // console.log(now.valueOf());
             // Save the changes to the document after 15 minutes
             await inorwat.save();
           }
@@ -151,7 +151,7 @@ router.put("/", authenticateToken, async (req, res) => {
 
     if (updatedData.motor === 1) {
       schedule.scheduleJob(
-        new Date(now.getTime() + 1 * 90 * 1000),
+        new Date(now.valueOf() + 1 * 90 * 1000),
         async () => {
           // Reset motor and sprayer to 0
           currentInorwat.motor = 0;
@@ -164,7 +164,7 @@ router.put("/", authenticateToken, async (req, res) => {
 
     if (updatedData.sprayer === 1) {
       schedule.scheduleJob(
-        new Date(now.getTime() + 1 * 90 * 1000),
+        new Date(now.valueOf() + 1 * 90 * 1000),
         async () => {
           // Reset motor and sprayer to 0
           currentInorwat.sprayer = 0;
