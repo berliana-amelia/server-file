@@ -56,7 +56,7 @@ const updateMotorAndSprayerStatus = async (inorwat) => {
   try {
     // Check if startStatus is 1
     if (inorwat.startStatus === 1) {
-      const now = new Date();
+      const now = new moment.tz("Asia/Jakarta");
 
       // Extract hours and minutes from the start time
       const [startHour, startMinute] = inorwat.startTime.split(":");
