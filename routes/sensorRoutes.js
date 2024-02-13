@@ -65,6 +65,7 @@ const updateMotorAndSprayerStatus = async (inorwat) => {
       const scheduledTime = new Date(now);
       scheduledTime.setHours(Number(startHour), Number(startMinute), 0, 0); // Set hours, minutes, seconds, and milliseconds
       console.log("schedule Time", scheduledTime.getTime());
+      console.log("current Time", now.getTime());
       // Check if the current time is within a 5-minute range of the scheduled time
       const timeDifference = Math.abs(now.getTime() - scheduledTime.getTime());
       const withinRange = timeDifference <= 1 * 60 * 1000; // 5 minutes in milliseconds
