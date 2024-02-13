@@ -220,7 +220,9 @@ router.get("/", authenticateToken, async (req, res) => {
 
     // Update motor and sprayer status based on startStatus
     await updateMotorAndSprayerStatus(inorwat);
-
+    inorwat.lastOnline = currentTime;
+    // Save the changes to the document after 15 minutes
+    await inorwat.save();
     res.json({
       message: "Data accessed successfully",
       motor: inorwat.motor,
@@ -232,7 +234,6 @@ router.get("/", authenticateToken, async (req, res) => {
       endDate: inorwat.endDate,
       startDate: inorwat.startDate,
       lastOnline: inorwat.lastOnline,
-      currentTime: currentTime,
     });
   } catch (error) {
     res.status(500).send(error.message);
