@@ -85,7 +85,7 @@ const updateMotorAndSprayerStatus = async (inorwat) => {
             const currentTime = moment().tz("Asia/Jakarta");
 
             // Add 4 minutes to the current time
-            const newTime = currentTime.add(4, "minutes");
+            const newTime = currentTime.add(3, "minutes");
 
             // Format the new time as HH:mm
             const newFormattedTime = newTime.format("HH:mm");
