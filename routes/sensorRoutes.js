@@ -18,9 +18,9 @@ const schedule = require("node-schedule");
 //       // Set the scheduled time based on the start time
 //       const scheduledTime = new Date(now);
 //       scheduledTime.setHours(Number(startHour), Number(startMinute), 0, 0); // Set hours, minutes, seconds, and milliseconds
-//       console.log("schedule Time", scheduledTime.getTime());
+//       console.log("schedule Time", scheduledTime.valueOf());
 //       // Check if the current time is within a 5-minute range of the scheduled time
-//       const timeDifference = Math.abs(now.valueOf() - scheduledTime.getTime());
+//       const timeDifference = Math.abs(now.valueOf() - scheduledTime.valueOf());
 //       const withinRange = timeDifference <= 1 * 60 * 1000; // 5 minutes in milliseconds
 
 //       if (withinRange) {
@@ -67,10 +67,10 @@ const updateMotorAndSprayerStatus = async (inorwat) => {
         { hour: startHour, minute: startMinute, second: 0, millisecond: 0 },
         "Asia/Jakarta"
       ); // Set hours, minutes, seconds, and milliseconds
-      console.log("schedule Time", scheduledTime.getTime());
+      console.log("schedule Time", scheduledTime.valueOf());
       console.log("current Time", now.valueOf);
       // Check if the current time is within a 5-minute range of the scheduled time
-      const timeDifference = Math.abs(now.valueOf() - scheduledTime.getTime());
+      const timeDifference = Math.abs(now.valueOf() - scheduledTime.valueOf());
       const withinRange = timeDifference <= 1 * 60 * 1000; // 5 minutes in milliseconds
 
       if (withinRange) {
