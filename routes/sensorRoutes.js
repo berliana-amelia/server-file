@@ -142,23 +142,11 @@ router.put("/", authenticateToken, async (req, res) => {
       // Update startTime to the current time in the format "15:59"
       const currentTime = moment().tz("Asia/Jakarta").format("HH:mm");
       updatedData.startTime = currentTime;
-
-      // Validate startDate before creating a new Date object
-      const isValidStartDate = moment(
-        updatedData.startDate,
-        "YYYY-MM-DD",
-        true
-      ).isValid();
-
-      if (isValidStartDate) {
-        const newEndDate = moment(updatedData.startDate)
-          .add(5, "days")
-          .format("YYYY-MM-DD");
-        updatedData.endDate = newEndDate;
-      } else {
-        console.error("Invalid startDate format");
-        // Handle the error or return from the function as needed
-      }
+      updatedData.startDate = moment().tz("Asia/Jakarta").format("YYYY-MM-DD");
+      const newEndDate = moment(updatedData.startDate)
+        .add(5, "days")
+        .format("YYYY-MM-DD");
+      updatedData.endDate = newEndDate;
     }
 
     if (updatedData.motor === 1) {
