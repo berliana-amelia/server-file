@@ -153,7 +153,7 @@ router.put("/", authenticateToken, async (req, res) => {
       if (isValidStartDate) {
         const newEndDate = moment(updatedData.startDate)
           .add(5, "days")
-          .toDate();
+          .format("YYYY-MM-DD");
         updatedData.endDate = newEndDate;
       } else {
         console.error("Invalid startDate format");
