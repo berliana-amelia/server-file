@@ -68,7 +68,7 @@ const updateMotorAndSprayerStatus = async (inorwat) => {
         "Asia/Jakarta"
       ); // Set hours, minutes, seconds, and milliseconds
       console.log("schedule Time", scheduledTime.valueOf());
-      console.log("current Time", now.valueOf);
+      console.log("current Time", now.valueOf());
       // Check if the current time is within a 5-minute range of the scheduled time
       const timeDifference = Math.abs(now.valueOf() - scheduledTime.valueOf());
       const withinRange = timeDifference <= 1 * 60 * 1000; // 5 minutes in milliseconds
