@@ -56,16 +56,19 @@ const updateMotorAndSprayerStatus = async (inorwat) => {
   try {
     // Check if startStatus is 1
     if (inorwat.startStatus === 1) {
-      const now = new moment.tz("Asia/Jakarta");
+      const now = moment.tz("Asia/Jakarta");
 
       // Extract hours and minutes from the start time
       const [startHour, startMinute] = inorwat.startTime.split(":");
 
       // Set the scheduled time based on the start time
-      const scheduledTime = new Date(now);
-      scheduledTime.setHours(Number(startHour), Number(startMinute), 0, 0); // Set hours, minutes, seconds, and milliseconds
+
+      const scheduledTime = moment.tz(
+        { hour: startHour, minute: startMinute, second: 0, millisecond: 0 },
+        "Asia/Jakarta"
+      ); // Set hours, minutes, seconds, and milliseconds
       console.log("schedule Time", scheduledTime.getTime());
-      console.log("current Time", now);
+      console.log("current Time", now.valueOf);
       // Check if the current time is within a 5-minute range of the scheduled time
       const timeDifference = Math.abs(now.valueOf() - scheduledTime.getTime());
       const withinRange = timeDifference <= 1 * 60 * 1000; // 5 minutes in milliseconds
