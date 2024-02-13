@@ -215,7 +215,7 @@ router.get("/", authenticateToken, async (req, res) => {
       { new: true }
     );
 
-    const currentTime = moment.tz("Asia/Jakarta");
+    const currentTime = moment.tz("Asia/Jakarta").format();
     if (!inorwat) return res.status(404).send("Inorwat not found");
 
     // Update motor and sprayer status based on startStatus
