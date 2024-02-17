@@ -58,22 +58,10 @@ const updateMotorAndSprayerStatus = async (inorwat) => {
     if (inorwat.startStatus === 1) {
       const now = moment.tz("Asia/Jakarta");
 
-      // Extract hours and minutes from the start time
-      const [startHour, startMinute] = inorwat.startTime.split(":");
+      // Check if the current time is within a 5-minute range of the last scheduled time
+      const withinRange = now.diff(inorwat.lastScheduledTime, "minutes") <= 5;
 
-      // Set the scheduled time based on the start time
-
-      const scheduledTime = moment.tz(
-        { hour: startHour, minute: startMinute, second: 0, millisecond: 0 },
-        "Asia/Jakarta"
-      ); // Set hours, minutes, seconds, and milliseconds
-      console.log("schedule Time", scheduledTime.valueOf());
-      console.log("current Time", now.valueOf());
-      // Check if the current time is within a 5-minute range of the scheduled time
-      const timeDifference = Math.abs(now.valueOf() - scheduledTime.valueOf());
-      const withinRange = timeDifference <= 5 * 60 * 1000; // 5 minutes in milliseconds
-
-      if (withinRange) {
+      if (!withinRange) {
         // Set motor and sprayer to 1
         inorwat.motor = 1;
         inorwat.sprayer = 1;
@@ -84,21 +72,15 @@ const updateMotorAndSprayerStatus = async (inorwat) => {
 
         // Schedule a job to reset motor and sprayer after 15 minutes
         schedule.scheduleJob(
-          new Date(now.valueOf() + 10 * 60 * 1000),
+          new Date(now.valueOf() + 15 * 60 * 1000),
           async () => {
             const currentTime = moment().tz("Asia/Jakarta");
 
-            // Add 4 minutes to the current time
-            const newTime = currentTime.add(10, "minutes");
-
-            // Format the new time as HH:mm
-            const newFormattedTime = newTime.format("HH:mm");
             // Reset motor and sprayer to 0
             inorwat.motor = 0;
             inorwat.sprayer = 0;
-            inorwat.startTime = newFormattedTime;
+            inorwat.startTime = currentTime; // Update last scheduled time
             console.log("change to 0");
-            // console.log(now.valueOf());
             // Save the changes to the document after 15 minutes
             await inorwat.save();
           }
@@ -109,6 +91,7 @@ const updateMotorAndSprayerStatus = async (inorwat) => {
     console.error("Error updating motor and sprayer status:", error.message);
   }
 };
+
 // Schedule the job every hour
 const scheduleJob = schedule.scheduleJob("0 * * * *", async () => {
   try {
