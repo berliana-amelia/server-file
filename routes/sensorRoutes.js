@@ -72,7 +72,7 @@ const updateMotorAndSprayerStatus = async (inorwat) => {
 
         // Schedule a job to reset motor and sprayer after 15 minutes
         schedule.scheduleJob(
-          new Date(now.valueOf() + 15 * 60 * 1000),
+          new Date(now.valueOf() + 10 * 60 * 1000),
           async () => {
             const currentTime = moment().tz("Asia/Jakarta");
 
