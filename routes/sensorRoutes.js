@@ -240,4 +240,27 @@ router.get("/", authenticateToken, async (req, res) => {
   }
 });
 
+router.get("/web", authenticateToken, async (req, res) => {
+  try {
+    const inorwat = await Inorwat.findOneAndUpdate(
+      { nama: "example" },
+      { new: true }
+    );
+    if (!inorwat) return res.status(404).send("Inorwat not found");
+    res.json({
+      message: "Data accessed successfully",
+      motor: inorwat.motor,
+      temperature: inorwat.temperature,
+      sprayer: inorwat.sprayer,
+      humidity: inorwat.humidity,
+      startTime: inorwat.startTime,
+      startStatus: inorwat.startStatus,
+      endDate: inorwat.endDate,
+      startDate: inorwat.startDate,
+      lastOnline: inorwat.lastOnline,
+    });
+  } catch (error) {
+    res.status(500).send(error.message);
+  }
+});
 module.exports = router;
