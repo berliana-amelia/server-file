@@ -71,7 +71,7 @@ const updateMotorAndSprayerStatus = async (inorwat) => {
       console.log("current Time", now.valueOf());
       // Check if the current time is within a 5-minute range of the scheduled time
       const timeDifference = Math.abs(now.valueOf() - scheduledTime.valueOf());
-      const withinRange = timeDifference <= 1 * 60 * 1000; // 5 minutes in milliseconds
+      const withinRange = timeDifference <= 5 * 60 * 1000; // 5 minutes in milliseconds
 
       if (withinRange) {
         // Set motor and sprayer to 1
@@ -84,12 +84,12 @@ const updateMotorAndSprayerStatus = async (inorwat) => {
 
         // Schedule a job to reset motor and sprayer after 15 minutes
         schedule.scheduleJob(
-          new Date(now.valueOf() + 1 * 30 * 1000),
+          new Date(now.valueOf() + 10 * 60 * 1000),
           async () => {
             const currentTime = moment().tz("Asia/Jakarta");
 
             // Add 4 minutes to the current time
-            const newTime = currentTime.add(3, "minutes");
+            const newTime = currentTime.add(10, "minutes");
 
             // Format the new time as HH:mm
             const newFormattedTime = newTime.format("HH:mm");
