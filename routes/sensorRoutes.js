@@ -62,40 +62,53 @@ const updateMotorAndSprayerStatus = async (inorwat) => {
       const [startHour, startMinute] = inorwat.startTime.split(":");
 
       // Set the scheduled time based on the start time
+
       const scheduledTime = moment.tz(
         { hour: startHour, minute: startMinute, second: 0, millisecond: 0 },
         "Asia/Jakarta"
-      );
-
+      ); // Set hours, minutes, seconds, and milliseconds
+      console.log("schedule Time", scheduledTime.valueOf());
+      console.log("current Time", now.valueOf());
       // Check if the current time is within a 5-minute range of the scheduled time
       const timeDifference = Math.abs(now.valueOf() - scheduledTime.valueOf());
-      const withinRange = timeDifference <= 3 * 60 * 1000; // 5 minutes in milliseconds
+      const withinRange = timeDifference <= 1 * 60 * 1000; // 5 minutes in milliseconds
 
       if (withinRange) {
-        // Check if it's time to turn off
-        const isTurnOffTime = now.minute() % 10 >= 5; // Turn off for 5 minutes every 10 minutes
-
-        if (isTurnOffTime) {
-          // Set motor and sprayer to 0
-          inorwat.motor = 0;
-          inorwat.sprayer = 0;
-          console.log("change to 0");
-        } else {
-          // Set motor and sprayer to 1
-          inorwat.motor = 1;
-          inorwat.sprayer = 1;
-          console.log("change to 1");
-        }
-
+        // Set motor and sprayer to 1
+        inorwat.motor = 1;
+        inorwat.sprayer = 1;
+        console.log("change to 1");
+        console.log("current Time", now.valueOf());
         // Save the changes to the document
         await inorwat.save();
+
+        // Schedule a job to reset motor and sprayer after 15 minutes
+        schedule.scheduleJob(
+          new Date(now.valueOf() + 1 * 30 * 1000),
+          async () => {
+            const currentTime = moment().tz("Asia/Jakarta");
+
+            // Add 4 minutes to the current time
+            const newTime = currentTime.add(3, "minutes");
+
+            // Format the new time as HH:mm
+            const newFormattedTime = newTime.format("HH:mm");
+            // Reset motor and sprayer to 0
+            inorwat.motor = 0;
+            inorwat.sprayer = 0;
+            inorwat.startTime = newFormattedTime;
+            console.log("change to 0");
+            // console.log(now.valueOf());
+            // Save the changes to the document after 15 minutes
+            await inorwat.save();
+          }
+        );
       }
     }
   } catch (error) {
     console.error("Error updating motor and sprayer status:", error.message);
   }
 };
-
 // Schedule the job every hour
 const scheduleJob = schedule.scheduleJob("0 * * * *", async () => {
   try {
@@ -207,37 +220,9 @@ router.get("/", authenticateToken, async (req, res) => {
 
     // Update motor and sprayer status based on startStatus
     await updateMotorAndSprayerStatus(inorwat);
-
-    res.json({
-      message: "Data accessed successfully",
-      motor: inorwat.motor,
-      temperature: inorwat.temperature,
-      sprayer: inorwat.sprayer,
-      humidity: inorwat.humidity,
-      startTime: inorwat.startTime,
-      startStatus: inorwat.startStatus,
-      endDate: inorwat.endDate,
-      startDate: inorwat.startDate,
-      lastOnline: inorwat.lastOnline,
-      currentTime: currentTime,
-    });
-  } catch (error) {
-    res.status(500).send(error.message);
-  }
-});
-
-router.get("/web", authenticateToken, async (req, res) => {
-  try {
-    const inorwat = await Inorwat.findOneAndUpdate(
-      { nama: "example" },
-      { new: true }
-    );
-
-    const currentTime = moment.tz("Asia/Jakarta").format();
-    if (!inorwat) return res.status(404).send("Inorwat not found");
-
-    // Update motor and sprayer status based on startStatus
-    await updateMotorAndSprayerStatus(inorwat);
+    inorwat.lastOnline = currentTime;
+    // Save the changes to the document after 15 minutes
+    await inorwat.save();
     res.json({
       message: "Data accessed successfully",
       motor: inorwat.motor,
