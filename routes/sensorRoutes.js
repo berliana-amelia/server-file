@@ -10,18 +10,21 @@ const schedule = require("node-schedule");
 //   try {
 //     // Check if startStatus is 1
 //     if (inorwat.startStatus === 1) {
-//       const now = new Date();
+//       const now = moment.tz("Asia/Jakarta");
 
 //       // Extract hours and minutes from the start time
 //       const [startHour, startMinute] = inorwat.startTime.split(":");
 
 //       // Set the scheduled time based on the start time
-//       const scheduledTime = new Date(now);
+//       const scheduledTime = moment.tz(
+//         { hour: startHour, minute: startMinute, second: 0, millisecond: 0 },
+//         "Asia/Jakarta"
+//       );
 //       scheduledTime.setHours(Number(startHour), Number(startMinute), 0, 0); // Set hours, minutes, seconds, and milliseconds
 //       console.log("schedule Time", scheduledTime.valueOf());
 //       // Check if the current time is within a 5-minute range of the scheduled time
 //       const timeDifference = Math.abs(now.valueOf() - scheduledTime.valueOf());
-//       const withinRange = timeDifference <= 1 * 60 * 1000; // 5 minutes in milliseconds
+//       const withinRange = timeDifference <= 2 * 60 * 1000; // 5 minutes in milliseconds
 
 //       if (withinRange) {
 //         // Set motor and sprayer to 1
@@ -38,8 +41,18 @@ const schedule = require("node-schedule");
 //           async () => {
 //             // Reset motor and sprayer to 0
 //             inorwat.motor = 0;
+//             console.log("change motor to 0");
+//             // console.log(now.valueOf());
+//             // Save the changes to the document after 15 minutes
+//             await inorwat.save();
+//           }
+//         );
+//         schedule.scheduleJob(
+//           new Date(now.valueOf() + 1 * 60 * 1000),
+//           async () => {
+//             // Reset motor and sprayer to 0
 //             inorwat.sprayer = 0;
-//             console.log("change to 0");
+//             console.log("change sprayer to 0");
 //             // console.log(now.valueOf());
 //             // Save the changes to the document after 15 minutes
 //             await inorwat.save();
@@ -86,6 +99,18 @@ const updateMotorAndSprayerStatus = async (inorwat) => {
         schedule.scheduleJob(
           new Date(now.valueOf() + 1 * 30 * 1000),
           async () => {
+            // Reset motor and sprayer to 0
+            inorwat.sprayer = 0;
+
+            console.log("change sprayer to 0");
+            // console.log(now.valueOf());
+            // Save the changes to the document after 15 minutes
+            await inorwat.save();
+          }
+        );
+        schedule.scheduleJob(
+          new Date(now.valueOf() + 1 * 60 * 1000),
+          async () => {
             const currentTime = moment().tz("Asia/Jakarta");
 
             // Add 4 minutes to the current time
@@ -95,11 +120,9 @@ const updateMotorAndSprayerStatus = async (inorwat) => {
             const newFormattedTime = newTime.format("HH:mm");
             // Reset motor and sprayer to 0
             inorwat.motor = 0;
-            inorwat.sprayer = 0;
             inorwat.startTime = newFormattedTime;
-            console.log("change to 0");
-            // console.log(now.valueOf());
-            // Save the changes to the document after 15 minutes
+            console.log("change Motor to 0, change startTime");
+
             await inorwat.save();
           }
         );
