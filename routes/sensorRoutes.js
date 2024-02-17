@@ -58,33 +58,37 @@ const updateMotorAndSprayerStatus = async (inorwat) => {
     if (inorwat.startStatus === 1) {
       const now = moment.tz("Asia/Jakarta");
 
-      // Check if the current time is within a 5-minute range of the last scheduled time
-      const withinRange = now.diff(inorwat.startTime, "minutes") <= 2;
+      // Extract hours and minutes from the start time
+      const [startHour, startMinute] = inorwat.startTime.split(":");
 
-      if (!withinRange) {
-        // Set motor and sprayer to 1
-        inorwat.motor = 1;
-        inorwat.sprayer = 1;
-        console.log("change to 1");
-        console.log("current Time", now.valueOf());
+      // Set the scheduled time based on the start time
+      const scheduledTime = moment.tz(
+        { hour: startHour, minute: startMinute, second: 0, millisecond: 0 },
+        "Asia/Jakarta"
+      );
+
+      // Check if the current time is within a 5-minute range of the scheduled time
+      const timeDifference = Math.abs(now.valueOf() - scheduledTime.valueOf());
+      const withinRange = timeDifference <= 3 * 60 * 1000; // 5 minutes in milliseconds
+
+      if (withinRange) {
+        // Check if it's time to turn off
+        const isTurnOffTime = now.minute() % 10 >= 5; // Turn off for 5 minutes every 10 minutes
+
+        if (isTurnOffTime) {
+          // Set motor and sprayer to 0
+          inorwat.motor = 0;
+          inorwat.sprayer = 0;
+          console.log("change to 0");
+        } else {
+          // Set motor and sprayer to 1
+          inorwat.motor = 1;
+          inorwat.sprayer = 1;
+          console.log("change to 1");
+        }
+
         // Save the changes to the document
         await inorwat.save();
-
-        // Schedule a job to reset motor and sprayer after 15 minutes
-        schedule.scheduleJob(
-          new Date(now.valueOf() + 5 * 60 * 1000),
-          async () => {
-            const currentTime = moment().tz("Asia/Jakarta").format("HH:mm");
-
-            // Reset motor and sprayer to 0
-            inorwat.motor = 0;
-            inorwat.sprayer = 0;
-            inorwat.startTime = currentTime; // Update last scheduled time
-            console.log("change to 0");
-            // Save the changes to the document after 15 minutes
-            await inorwat.save();
-          }
-        );
       }
     }
   } catch (error) {
